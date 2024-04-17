@@ -8,15 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
-
-   
     var body: some View {
         VStack {
-            Text("Sample Text")
-                .font(.custom("Copperplate", size: 70))
-                .padding(20)
-                .border(Color.black)
-            
+          
         }
     }
 }
