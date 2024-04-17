@@ -10,7 +10,22 @@ import SwiftUI
 struct ContentView: View {
    
     var body: some View {
+        VStack {
+            VStack{
+                Text("Text1")
+                Text("Text2")
+                MyHStackView()
+            }
+        }
+    }
+}
 
+struct MyHStackView: View {
+    var body: some View {
+        HStack {
+            Text("Text3")
+            Text("Text4")
+        }
     }
 }
 
