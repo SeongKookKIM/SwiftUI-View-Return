@@ -8,26 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
+    let carStack = HStack {
+        Text("Car Image")
+        Image(systemName: "car.fill")
+    }
    
     var body: some View {
         VStack {
-            VStack{
-                Text("Text1")
-                Text("Text2")
-                MyHStackView()
-            }
+            Text("Main Title")
+                .font(.largeTitle)
+            carStack
         }
     }
 }
 
-struct MyHStackView: View {
-    var body: some View {
-        HStack {
-            Text("Text3")
-            Text("Text4")
-        }
-    }
-}
+
 
 #Preview {
     ContentView()
