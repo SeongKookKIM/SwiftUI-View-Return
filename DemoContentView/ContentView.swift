@@ -55,6 +55,8 @@ class GithubViewModel: ObservableObject {
             
         } catch {
             self.error = error
+            repositories = []
+            user = nil
             print("Error: \(error)")
         }
     }
