@@ -37,18 +37,21 @@ struct ContentView: View {
     @State private var user: User?
     @State private var repositories: [Repository] = []
     @State private var status = "Fetch Data"
+    @State private var error: Error?
     
     let githubService = GithubService()
     
     var body: some View {
         VStack{
-         TextField("Github userName:", text: $username)
+            TextField("Github userName:", text: $username)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
             Button(status) {
                 Task {
                     do {
+                        error = nil
+                        
                         status = "Loading"
                         async let fetchUser = githubService.fetchUser(username: username)
                         async let fetchRepositoris = githubService.fetchReopsitories(username: username)
@@ -61,6 +64,9 @@ struct ContentView: View {
                         print("Error: \(error)")
                     }
                 }
+            }
+            if let error = error {
+                Text("Error: \(error.localizedDescription)")
             }
             
             if let user = user {
@@ -95,6 +101,8 @@ struct ContentView: View {
             Button("Fetch Data in Background") {
                 Task.detached {
                     do {
+                        error = nil
+                        
                         let service = GithubService()
                         try await withThrowingTaskGroup(of: Void.self) { group in
                             group.addTask{
@@ -106,10 +114,10 @@ struct ContentView: View {
                             try await group.waitForAll()
                         }
                         
-                      
+                        
                     } catch {
                         DispatchQueue.main.async {
-                            print("\(error)")
+                            self.error = error
                         }
                     }
                 }
@@ -118,7 +126,7 @@ struct ContentView: View {
         }
     }
     
-  
+    
 }
 
 
