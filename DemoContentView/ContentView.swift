@@ -31,15 +31,43 @@ actor GithubService {
     }
 }
 
-
-struct ContentView: View {
-    @State private var username = "SeongKookKIM"
-    @State private var user: User?
-    @State private var repositories: [Repository] = []
-    @State private var status = "Fetch Data"
-    @State private var error: Error?
+@MainActor
+class GithubViewModel: ObservableObject {
+    
+    @Published var user: User?
+    @Published var repositories: [Repository] = []
+    @Published var error: Error?
+    @Published var status = "Fetch Data"
     
     let githubService = GithubService()
+    
+    func fetchData(username: String) async {
+        do {
+            error = nil
+            
+            status = "Loading"
+            async let fetchUser = githubService.fetchUser(username: username)
+            async let fetchRepositoris = githubService.fetchReopsitories(username: username)
+            
+            user = try await fetchUser
+            repositories = try await fetchRepositoris
+            status = "Fetch Data"
+            
+        } catch {
+            self.error = error
+            print("Error: \(error)")
+        }
+    }
+    
+}
+
+
+struct ContentView: View {
+
+    @StateObject private var viewModel = GithubViewModel()
+    @State private var username = "SeongKookKIM"
+    
+
     
     var body: some View {
         VStack{
@@ -47,29 +75,16 @@ struct ContentView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
-            Button(status) {
+            Button(viewModel.status) {
                 Task {
-                    do {
-                        error = nil
-                        
-                        status = "Loading"
-                        async let fetchUser = githubService.fetchUser(username: username)
-                        async let fetchRepositoris = githubService.fetchReopsitories(username: username)
-                        
-                        user = try await fetchUser
-                        repositories = try await fetchRepositoris
-                        status = "Fetch Data"
-                        
-                    } catch {
-                        print("Error: \(error)")
-                    }
+                    await viewModel.fetchData(username:username)
                 }
             }
-            if let error = error {
+            if let error = viewModel.error {
                 Text("Error: \(error.localizedDescription)")
             }
             
-            if let user = user {
+            if let user = viewModel.user {
                 AsyncImage(url: user.avatar_url) {image in
                     image.resizable()
                 } placeholder: {
@@ -82,12 +97,9 @@ struct ContentView: View {
                     .font(.title)
             }
             
-            if(repositories.count != 0) {
-                Text("\(repositories.count)개")
-            }
             
             
-            List(repositories) {repo in
+            List(viewModel.repositories) {repo in
                 VStack(alignment: .leading) {
                     Text(repo.name)
                         .font(.headline)
@@ -95,31 +107,6 @@ struct ContentView: View {
                     Text(repo.description ?? "No description")
                         .font(.subheadline)
                     
-                }
-            }
-            
-            Button("Fetch Data in Background") {
-                Task.detached {
-                    do {
-                        error = nil
-                        
-                        let service = GithubService()
-                        try await withThrowingTaskGroup(of: Void.self) { group in
-                            group.addTask{
-                                repositories = try await service.fetchReopsitories(username: username)
-                            }
-                            group.addTask{
-                                user = try await service.fetchUser(username: username)
-                            }
-                            try await group.waitForAll()
-                        }
-                        
-                        
-                    } catch {
-                        DispatchQueue.main.async {
-                            self.error = error
-                        }
-                    }
                 }
             }
             
