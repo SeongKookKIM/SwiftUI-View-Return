@@ -6,13 +6,13 @@ struct Repository: Codable, Identifiable {
     let id: Int
     let name:String
     let description: String?
-
 }
 
 
 struct ContentView: View {
     @State private var username = "SK"
     @State private var repositories: [Repository] = []
+    @State private var status = "Fetch Data"
     
     var body: some View {
         VStack{
@@ -20,12 +20,13 @@ struct ContentView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
-            Button("Fetch Data") {
+            Button(status) {
                 Task {
                     do {
+                        status = "Loading"
                         async let fetchRepositoris = fetchReopsitories(username: username)
-                        
                         repositories = try await fetchRepositoris
+                        status = "Fetch Data"
                         
                     } catch {
                         print("Error: \(error)")
@@ -43,6 +44,7 @@ struct ContentView: View {
                     
                 }
             }
+            
         }
     }
     
