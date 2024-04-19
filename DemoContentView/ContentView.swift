@@ -13,12 +13,18 @@ struct ContentView: View {
             TextField("Enter user name", text: $userName)
                 .border(Color.black)
             Text(userName)
-            Image(systemName: wifiEnabled ? "wifi" : "wifi.slash")
-                .font(.largeTitle)
+            WifiImageView(wifiEnabled: $wifiEnabled)
         }
     }
 }
 
+struct WifiImageView: View {
+    @Binding var wifiEnabled: Bool
+    var body: some View {
+        Image(systemName: wifiEnabled ? "wifi" : "wifi.slash")
+            .font(.largeTitle)
+    }
+}
 
 
 #Preview {
