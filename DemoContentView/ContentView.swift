@@ -5,14 +5,9 @@ import SwiftUI
 
 class DemoData: ObservableObject {
     @Published var userCount = 0
-    @Published var currentUser = ""
     
-    init() {
-        updateData()
-    }
-    
-    func updateData() {
-        
+    func increament() {
+        userCount += 1
     }
 }
 
@@ -22,7 +17,14 @@ struct ContentView: View {
     
     var body: some View {
         VStack{
-            Text("\(demoData.currentUser), you are user number \(demoData.userCount)")
+            Text("you are user number \(demoData.userCount)")
+            
+            Button(action:{
+                demoData.increament()
+            }) {
+                Text("Increament")
+                    .font(.largeTitle)
+            }
         }
     }
 }
